@@ -1,0 +1,8 @@
+certifi==2026.1.4
+charset-normalizer==3.4.4
+filelock==3.20.3
+idna==3.11
+pyTelegramBotAPI==4.30.0
+requests==2.32.5
+urllib3==2.6.3
+Flask==3.1.0
