@@ -29,7 +29,7 @@ def _read_store_unlocked():
 
 @app.route('/')
 def index():
-    return send_from_directory('receive-transaction', 'index.html')
+    return send_from_directory('.', 'index.html')
 
 @app.route('/receive-transaction')
 def receive_transaction():
