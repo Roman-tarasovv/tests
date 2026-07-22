@@ -6,7 +6,7 @@ import json
 from filelock import FileLock
 import os
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__, static_folder=None)
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -41,13 +41,25 @@ def get_records():
         store = _read_store_unlocked()
         return jsonify(store)
 
-@app.route('/&lt;path:path&gt;')
+@app.route('/<path:path>')
 def static_files(path):
-    forbidden_exts = ['.py', '.txt', '.service', '.ini', '.temp']
+    p = (path or "").replace("\\", "/").lstrip("/")
+
+    forbidden_exts = {".py", ".txt", ".service", ".ini", ".temp"}
+    forbidden_prefixes = ("venv/", "data/", ".git/")
+
+    lp = p.lower()
+    if lp.startswith(forbidden_prefixes):
+        return "404 Not Found", 404
     for ext in forbidden_exts:
-        if path.lower().endswith(ext) or path.lower().startswith('venv/'):
+        if lp.endswith(ext):
             return "404 Not Found", 404
-    return send_from_directory('.', path)
+
+    if lp.startswith("receive-transaction/"):
+        rel = p.split("/", 1)[1]
+        return send_from_directory("receive-transaction", rel)
+
+    return send_from_directory(".", p)
 
 def run_flask():
     port = int(os.environ.get('PORT', 8888))
