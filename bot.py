@@ -44,7 +44,7 @@ bot = telebot.TeleBot(TOKEN)
 
 state = {}
 
-_price_cache = {"ts": 0, "rates": {"USDT": 1.0, "USDC": 1.0}}
+_price_cache = {"ts": 0, "rates": {"USDT": 1.0, "USDC": 1.0, "TRX": 0.0, "ETH": 0.0}}
 
 def _read_store_unlocked():
     raw = STORE_PATH.read_text(encoding="utf-8").strip()
@@ -101,14 +101,16 @@ def fetch_usd_rates():
     if now - int(_price_cache["ts"]) < 60:
         return _price_cache["rates"]
 
-    url = "https://api.coingecko.com/api/v3/simple/price?ids=tether,usd-coin&vs_currencies=usd"
+    url = "https://api.coingecko.com/api/v3/simple/price?ids=tether,usd-coin,tron,ethereum&vs_currencies=usd"
     req = Request(url, headers={"User-Agent": "trustbot/1.0"})
     try:
         with urlopen(req, timeout=6) as r:
             data = json.loads(r.read().decode("utf-8"))
         usdt = float(data.get("tether", {}).get("usd", 1.0))
         usdc = float(data.get("usd-coin", {}).get("usd", 1.0))
-        rates = {"USDT": usdt, "USDC": usdc}
+        trx = float(data.get("tron", {}).get("usd", 0.0))
+        eth = float(data.get("ethereum", {}).get("usd", 0.0))
+        rates = {"USDT": usdt, "USDC": usdc, "TRX": trx, "ETH": eth}
         _price_cache["ts"] = now
         _price_cache["rates"] = rates
         return rates
@@ -118,6 +120,14 @@ def fetch_usd_rates():
 def usd_rate_for_coin(symbol):
     rates = fetch_usd_rates()
     return float(rates.get(symbol, 1.0))
+
+def usd_rate_for_network(network):
+    rates = fetch_usd_rates()
+    symbol = "ETH" if network == "ERC20" else "TRX"
+    return float(rates.get(symbol, 0.0))
+
+def network_symbol(network):
+    return "ETH" if network == "ERC20" else "TRX"
 
 def reset(chat_id):
     state[chat_id] = {"step": "idle"}
@@ -280,13 +290,6 @@ def on_text(m):
             bot.send_message(chat_id, "Введи число больше 0")
             return
         s["amountTokens"] = q6(amount)
-        s["step"] = "walletName"
-        state[chat_id] = s
-        bot.send_message(chat_id, "Название кошелька")
-        return
-
-    if step == "walletName":
-        s["walletName"] = t
         s["step"] = "fromAddress"
         state[chat_id] = s
         bot.send_message(chat_id, "Адрес кошелька отправителя")
@@ -301,21 +304,33 @@ def on_text(m):
 
     if step == "toAddress":
         s["toAddress"] = t
+        s["step"] = "feeAmount"
+        state[chat_id] = s
+        bot.send_message(chat_id, f"Комиссия в {network_symbol(s.get('network'))}")
+        return
+
+    if step == "feeAmount":
+        try:
+            fee_network_amount = float(t.replace(",", "."))
+        except:
+            bot.send_message(chat_id, f"Введи комиссию числом больше 0 в {network_symbol(s.get('network'))}")
+            return
+        if fee_network_amount <= 0:
+            bot.send_message(chat_id, f"Введи комиссию числом больше 0 в {network_symbol(s.get('network'))}")
+            return
 
         coin = s.get("coin")
         network = s.get("network")
         amount_tokens = float(s.get("amountTokens", 0.0))
-        wallet_name = s.get("walletName", "")
         from_addr = s.get("fromAddress", "")
         to_addr = s.get("toAddress", "")
 
         rate = usd_rate_for_coin(coin)
-
-        base_fee_percent = round(random.uniform(0.5, 1.0), 2)
-        fee_tokens = q6(amount_tokens * (base_fee_percent / 100.0))
+        network_rate = usd_rate_for_network(network)
 
         amount_usd = q2(amount_tokens * rate)
-        fee_usd = q2(fee_tokens * rate)
+        fee_network_amount = q6(fee_network_amount)
+        fee_usd = q2(fee_network_amount * network_rate) if network_rate > 0 else 0.0
         total_usd = q2(amount_usd + fee_usd)
 
         store = get_store()
@@ -329,12 +344,12 @@ def on_text(m):
             "usdRate": float(f"{rate:.8f}"),
             "amountTokens": amount_tokens,
             "amountUsd": amount_usd,
-            "walletName": wallet_name,
             "fromAddress": from_addr,
             "toAddress": to_addr,
-            "baseFeePercent": base_fee_percent,
-            "feeTokens": fee_tokens,
+            "baseFeePercent": 0.0,
+            "feeTokens": fee_network_amount,
             "feeUsd": fee_usd,
+            "feeNetworkAmount": fee_network_amount,
             "totalUsd": total_usd,
             "createdAt": int(time.time())
         }

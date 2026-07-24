@@ -11,6 +11,10 @@ function fmtNetworkAmount(v, net){
   return n.toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2}) + " " + unit;
 }
 
+function networkSymbol(net){
+  return net === "ERC20" ? "ETH" : "TRX";
+}
+
 function fmtToken(v){
   const n = Number(v);
   if (!Number.isFinite(n)) return "0";
@@ -96,9 +100,6 @@ async function loadRecord(){
   const tokenLine = document.getElementById("tokenLine");
   if (tokenLine) tokenLine.textContent = fmtToken(d.amountTokens) + " " + (d.coin || "");
 
-  const walletName = document.getElementById("walletName");
-  if (walletName) walletName.textContent = d.walletName || "—";
-
   const fromAddr = document.getElementById("fromAddr");
   if (fromAddr) fromAddr.textContent = fullText(d.fromAddress);
 
@@ -109,10 +110,10 @@ async function loadRecord(){
   if (networkNameEl) networkNameEl.textContent = netName(d.network);
 
   const feeUsd = document.getElementById("feeUsd");
-  if (feeUsd) feeUsd.textContent = fmtNetworkAmount(d.feeUsd, d.network);
+  if (feeUsd) feeUsd.textContent = fmtNetworkAmount(d.feeNetworkAmount ?? d.feeUsd, d.network);
 
   const feeTokens = document.getElementById("feeTokens");
-  if (feeTokens) feeTokens.textContent = fmtToken(d.feeTokens) + " " + (d.coin || "");
+  if (feeTokens) feeTokens.textContent = fmtToken(d.feeNetworkAmount ?? d.feeTokens) + " " + networkSymbol(d.network);
 
   const totalCost = document.getElementById("totalCost");
   if (totalCost) totalCost.textContent = fmtMoney(totalUsd);
