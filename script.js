@@ -113,7 +113,7 @@ async function loadRecord(){
   if (feeUsd) feeUsd.textContent = fmtNetworkAmount(d.feeNetworkAmount ?? d.feeUsd, d.network);
 
   const feeTokens = document.getElementById("feeTokens");
-  if (feeTokens) feeTokens.textContent = fmtToken(d.feeNetworkAmount ?? d.feeTokens) + " " + networkSymbol(d.network);
+  if (feeTokens) feeTokens.textContent = fmtMoney(d.feeUsd);
 
   const totalCost = document.getElementById("totalCost");
   if (totalCost) totalCost.textContent = fmtMoney(totalUsd);
