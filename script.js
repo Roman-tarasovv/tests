@@ -4,17 +4,22 @@ function fmtMoney(v){
   return n.toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2})+" $";
 }
 
+function fmtNetworkAmount(v, net){
+  const n = Number(v);
+  const unit = net === "ERC20" ? "ETH" : "TRX";
+  if (!Number.isFinite(n)) return "0,00 " + unit;
+  return n.toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2}) + " " + unit;
+}
+
 function fmtToken(v){
   const n = Number(v);
   if (!Number.isFinite(n)) return "0";
   return n.toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:6});
 }
 
-function ellipsize(s){
+function fullText(s){
   if (!s) return "—";
-  const t = String(s).trim();
-  if (t.length <= 18) return t;
-  return t.slice(0,6)+"..."+t.slice(-6);
+  return String(s).trim() || "—";
 }
 
 function getBaseFromScript(){
@@ -95,19 +100,16 @@ async function loadRecord(){
   if (walletName) walletName.textContent = d.walletName || "—";
 
   const fromAddr = document.getElementById("fromAddr");
-  if (fromAddr) fromAddr.textContent = ellipsize(d.fromAddress);
+  if (fromAddr) fromAddr.textContent = fullText(d.fromAddress);
 
   const toAddr = document.getElementById("toAddr");
-  if (toAddr) toAddr.textContent = ellipsize(d.toAddress);
+  if (toAddr) toAddr.textContent = fullText(d.toAddress);
 
   const networkNameEl = document.getElementById("networkName");
   if (networkNameEl) networkNameEl.textContent = netName(d.network);
 
-  const discountBadge = document.getElementById("discountBadge");
-  if (discountBadge) discountBadge.textContent = String(d.discountPercent ?? 0) + "% Discount";
-
   const feeUsd = document.getElementById("feeUsd");
-  if (feeUsd) feeUsd.textContent = fmtMoney(d.feeUsd);
+  if (feeUsd) feeUsd.textContent = fmtNetworkAmount(d.feeUsd, d.network);
 
   const feeTokens = document.getElementById("feeTokens");
   if (feeTokens) feeTokens.textContent = fmtToken(d.feeTokens) + " " + (d.coin || "");

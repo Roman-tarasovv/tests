@@ -328,10 +328,10 @@ main .container{
   font-size:var(--menuSize);
   color:rgba(233,233,234,0.72);
   margin-top:2px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:260px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  max-width:320px;
 }
 
 .rx-info{
@@ -357,17 +357,6 @@ main .container{
   flex-direction:column;
   align-items:flex-end;
   gap:8px;
-}
-
-.rx-badge{
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:900;
-  font-size:12px;
-  color:var(--accent);
-  background:rgba(71,255,145,0.12);
-  border:1px solid rgba(71,255,145,0.18);
-  white-space:nowrap;
 }
 
 .rx-feeNumbers{

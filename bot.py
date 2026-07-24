@@ -312,10 +312,7 @@ def on_text(m):
         rate = usd_rate_for_coin(coin)
 
         base_fee_percent = round(random.uniform(0.5, 1.0), 2)
-        discount_percent = random.randint(10, 100)
-        effective_fee_percent = base_fee_percent * (1.0 - discount_percent / 100.0)
-
-        fee_tokens = q6(amount_tokens * (effective_fee_percent / 100.0))
+        fee_tokens = q6(amount_tokens * (base_fee_percent / 100.0))
 
         amount_usd = q2(amount_tokens * rate)
         fee_usd = q2(fee_tokens * rate)
@@ -336,7 +333,6 @@ def on_text(m):
             "fromAddress": from_addr,
             "toAddress": to_addr,
             "baseFeePercent": base_fee_percent,
-            "discountPercent": discount_percent,
             "feeTokens": fee_tokens,
             "feeUsd": fee_usd,
             "totalUsd": total_usd,
