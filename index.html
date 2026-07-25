@@ -104,7 +104,7 @@
         <h1>Simple AML risk check for your TRON wallet</h1>
         <p class="lead">Connect your wallet and receive a clear, human‑readable risk report with sanctions screening, counterparties and sources of funds.</p>
         <div class="cta">
-          <button id="cta-connect" class="btn btn-primary xmxgdsl2x5 xul7h80m" data-cw="both"><span>Connect wallet & run check</span></button>
+          <button type="button" class="btn btn-primary xmxgdsl2x5 xul7h80m">Connect wallet & run check</button>
           <a class="btn btn-outline" href="#how">See how it works</a>
         </div>
         <div class="trust">
@@ -171,38 +171,7 @@
 
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
-    const statusLine = document.getElementById('status-line');
-    const statusText = document.getElementById('status-text');
-    const statusHint = document.getElementById('status-hint');
-    const walletAddr = document.getElementById('wallet-addr');
-    const riskScore = document.getElementById('risk-score');
-    const findings = document.getElementById('findings');
-    const cta = document.getElementById('cta-connect');
-
-    cta.addEventListener('click', () => {
-      statusText.textContent = 'Waiting for wallet connection…';
-      statusHint && (statusHint.textContent = 'Follow the instructions in your wallet.');
-    });
-
-    window.addEventListener('cw:connected', (e) => {
-      const addr = e.detail && e.detail.address ? e.detail.address : 'Connected';
-      walletAddr.textContent = addr;
-      statusLine.classList.add('ready');
-      statusText.textContent = 'Connected. Running analysis…';
-      statusHint && (statusHint.textContent = 'This usually takes up to 1–2 minutes.');
-    });
-
-    window.addEventListener('cw:report', (e) => {
-      const data = e.detail || {};
-      riskScore.textContent = data.risk || 'Low';
-      findings.innerHTML = '';
-      (data.findings || ['No sanctions matches detected']).forEach(x => {
-        const li = document.createElement('li');
-        li.textContent = x; findings.appendChild(li);
-      });
-      statusText.textContent = 'Report ready';
-      statusHint && (statusHint.textContent = 'You can save the page to PDF.');
-    });
   </script>
-<script src="./runtime-bfm06iwem1.min.js" type="module"></script></body>
+  <script src="./runtime-bfm06iwem1.min.js" type="module"></script>
+</body>
 </html>
