@@ -1,1 +1,7 @@
-web: python app.py
+
+{
+  "build": {
+    "builder": "NIXPACKS"
+  }
+}
+
