@@ -1,34 +1,20 @@
-1. Выполняем команду: python3 -m venv venv
-Если выдаёт установить команду apt install python3.x-venv , то выполняем её и после этого выполняем команду что была выше ( x - это текущая версия python )
-
-2. Выполняем команду: venv/bin/pip install -r requirements.txt
-
-3. Создаём файл с раширение .service (например bot.service) и вставялем туда:
-[Unit]
-Description=Telegram Bot
-
-[Service]
-Type=simple
-WorkingDirectory=CURRENT_DIR
-ExecStart=CURRENT_DIR/venv/bin/python CURRENT_DIR/bot.py
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-
-CURRENT_DIR - это текущая директория где вы распаковали zip. Например /var/www/my-site
-После этого сохраняем файл
-
-4. Выполняем команду: ln -s CURRENT_DIR/bot.service /etc/systemd/system/bot.service
-CURRENT_DIR - это текущая директория где вы распаковали zip. Например /var/www/my-site
-bot.service - меняете на ваше имя файла, что вы придумали в шаге 3
-
-5. Выполняем команду: systemctl daemon-reload
-
-6. Выполняем команду: systemctl enable bot
-bot - меняете на ваше имя файла без .service, что вы придумали в шаге 3
-
-7. Выполняем команду: systemctl restart bot
-bot - меняете на ваше имя файла без .service, что вы придумали в шаге 3
-
-Готово, если никаих ошибок не было значит всё збс
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="page page--center">
+    <div class="home-card">
+      <div class="home-title">Create a New Year crypto gift</div>
+      <div class="home-sub">Создай подарок через бота и открой ссылку вида<br> /receive-transaction?ID</div>
+    </div>
+  </div>
+</body>
+</html>
